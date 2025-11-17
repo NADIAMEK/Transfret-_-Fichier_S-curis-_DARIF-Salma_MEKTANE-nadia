@@ -94,9 +94,13 @@ Le projet se compose de deux modules principaux :
 /src
  └── securefile
       ├── SecureFileServer.java       # Classe principale du serveur
+   
       ├── SecureFileClient.java       # Classe principale du client
+   
       ├── ClientTransferHandler.java  # Gestionnaire de connexion côté serveur
+   
       └── CryptoUtils.java            # Fonctions utilitaires de cryptographie
+   
 
 /received_files                        # Dossier créé automatiquement pour stocker les fichiers reçus
 /out                                    # Dossier de compilation/output (si nécessaire)
