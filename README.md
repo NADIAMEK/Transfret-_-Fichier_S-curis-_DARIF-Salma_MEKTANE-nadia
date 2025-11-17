@@ -93,7 +93,7 @@ Réponses possibles :
 
 - TRANSFER_FAIL
 
-🖥️ 2.2 SecureFileClient (Client)
+ 2.2 SecureFileClient (Client)
 2.2..1 Interface Utilisateur
 
 Le client fonctionne en ligne de commande.
@@ -167,7 +167,7 @@ Si les deux hachages sont identiques → fichier intact.
 .gitignore
 README.md
 
-🚀 Exécution
+6-  Exécution
 1. Lancer le Serveur
 
 Importer le projet dans IntelliJ 
