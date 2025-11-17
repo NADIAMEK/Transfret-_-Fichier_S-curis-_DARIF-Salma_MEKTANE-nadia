@@ -103,8 +103,11 @@ Le projet se compose de deux modules principaux :
    
 
 /received_files                        # Dossier créé automatiquement pour stocker les fichiers reçus
+
 /out                                    # Dossier de compilation/output (si nécessaire)
+
 /.gitignore                             # Fichier pour ignorer certains fichiers dans Git
+
 README.md                               # Documentation du projet
 
 6. Exécution
