@@ -111,6 +111,7 @@ Le projet se compose de deux modules principaux :
 README.md                               # Documentation du projet
 
 6. Exécution
+   
 6.1 Lancer le serveur
 
 Importer le projet dans IntelliJ.
