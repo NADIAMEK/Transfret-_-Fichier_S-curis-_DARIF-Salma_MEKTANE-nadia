@@ -1,179 +1,121 @@
 Transfert de fichiers sécurisé
 
-// Projet réalisé par DARIF Salma et MEKTANE Nadia.
+///Projet réalisé par DARIF Salma et MEKTANE Nadia
 
- 1- Description du Projet
+Ce projet met en place un système Client–Serveur sécurisé pour le transfert de fichiers via TCP, avec chiffrement AES et contrôle d’intégrité SHA-256.
 
-Ce projet consiste en la conception et l’implémentation d’un système Client–Serveur sécurisé permettant le transfert de fichiers via TCP.
-L’application intègre des mécanismes de sécurité (chiffrement), un protocole de session, ainsi qu’un système de contrôle d’intégrité, garantissant que les données échangées sont confidentielles, intactes et protégées.
+1. Description du Projet
 
-2- Objectifs du Projet
+Le système permet :
 
-Concevoir un protocole de communication structuré en trois phases (Authentification, Négociation, Transfert).
+- La transmission sécurisée de fichiers entre un client et un serveur.
 
-Sécuriser le transfert des fichiers via :
+- L’authentification des utilisateurs avant tout transfert.
 
-- chiffrement symétrique AES
+- La vérification d’intégrité des fichiers grâce au SHA-256.
 
-- vérification d’intégrité SHA-256.
+- Le chiffrement des fichiers via AES pour garantir la confidentialité.
 
-- Implémenter un serveur TCP multi-threadé, capable de gérer plusieurs clients simultanément.
+- La gestion de plusieurs clients simultanément (multi-threading côté serveur).
 
-- Mettre en place un client console capable de préparer, chiffrer et envoyer un fichier en suivant le protocole défini.
+2. Objectifs
 
-3- Architecture du Système
+  1.Implémenter un protocole en trois phases :
 
-Le système se compose de deux modules principaux :
+- Authentification
 
-- SecureFileServer — Serveur TCP multi-threadé
+- Négociation des métadonnées du fichier
 
-- SecureFileClient — Client console interactif
+- Transfert et vérification du fichier
 
-Les deux applications échangent via un protocole applicatif organisé en trois phases sécurisées.
+  2.Sécuriser les transferts avec :
 
- 1.1 SecureFileServer (Serveur)
-1.1.1 Écoute et Gestion des Connexions
+- AES (128 bits, ECB/PKCS5Padding)
 
-Le serveur écoute sur un port TCP défini.
+- SHA-256 pour garantir l’intégrité
 
-Chaque nouveau client est immédiatement pris en charge par un thread dédié :
-ClientTransferHandler
+ 3.Créer un serveur TCP capable de gérer plusieurs clients simultanément.
 
-Le serveur peut donc gérer plusieurs clients en parallèle.
+ 4.Créer un client console interactif pour préparer et envoyer un fichier.
 
-1.1.2 Protocole de Session
-Phase 1 — Authentification
+3. Architecture du Système
 
-Le serveur reçoit :
+Le projet se compose de deux modules principaux :
 
-- login
+3.1 SecureFileServer (serveur)
 
-- mot de passe
+- Écoute sur un port TCP défini (par défaut 9000).
 
-- Les identifiants valides sont stockés dans :
+- Chaque connexion est prise en charge par un thread dédié (ClientTransferHandler).
 
-une Map<String, String> statique, ou un fichier externe.
+- Gère le protocole en trois phases :
 
-Réponses possibles :
+     1. Authentification : login + mot de passe → AUTH_OK / AUTH_FAIL.
 
--  AUTH_OK
+     2. Négociation : envoie des métadonnées du fichier → READY_FOR_TRANSFER.
 
--  AUTH_FAIL → la connexion est fermée.
+     3.Transfert : réception du fichier chiffré, déchiffrement AES, vérification SHA-256 → TRANSFER_SUCCESS / TRANSFER_FAIL.
 
-Phase 2 — Négociation
+3.2 SecureFileClient (client)
 
-Le serveur reçoit les méta-données du fichier :
+- Interface console pour saisir :
 
-- nom
+     . IP du serveur
 
-- taille (en octets)
+     . Port
 
-- hachage SHA-256
+     . Login et mot de passe
 
-Si les données sont valides :
- réponse : READY_FOR_TRANSFER
+     . Chemin du fichier à envoyer
 
-Phase 3 — Transfert et Vérification
+- Pré-traitement du fichier :
 
-Le serveur :
+     . Calcul SHA-256
 
-- reçoit le fichier chiffré,
+     . Chiffrement AES
 
-- le déchiffre (AES),
+     . Respect strict du protocole : Auth → Négociation → Transfert
 
-- enregistre le fichier,
+4. Sécurité et Cryptographie
+- AES (Confidentialité)
 
-- recalcule le SHA-256,
+     . Clé partagée entre client et serveur (128 bits, ECB/PKCS5Padding).
 
-- compare avec celui envoyé par le client.
+     . Chiffre le contenu complet du fichier.
 
-Réponses possibles :
+- SHA-256 (Intégrité)
 
--  TRANSFER_SUCCESS
+    . Calculé côté client et vérifié côté serveur.
 
-- TRANSFER_FAIL
+    . Permet de détecter toute altération du fichier pendant le transfert.
 
- 2.2 SecureFileClient (Client)
-2.2..1 Interface Utilisateur
 
-Le client fonctionne en ligne de commande.
-L’utilisateur saisit :
-
-- IP du serveur
-
-- port
-
-- login
-
-- mot de passe
-
-- chemin du fichier à envoyer
-
-2.2 Pré-traitement du Fichier
-
-Avant l’envoi, le client doit :
-
- 1. Calculer le hachage SHA-256
-
-Utilisation de l’API :
-java.security.MessageDigest
-
- 2. Chiffrer le fichier en AES
-
-Utilisation de :
-javax.crypto
-Algorithme et mode :
-AES/ECB/PKCS5Padding
-
-La clé AES est partagée entre le client et le serveur (méthode d’échange laissée à l’appréciation du développeur).
-
-2.3 Communication
-
-Le client suit strictement les trois phases imposées par le protocole :
-
-1 - AUTH
-2 -  NEGOTIATION
-3 -  TRANSFER
-
-
-Chaque étape nécessite la validation explicite du serveur.
-
-4- Sécurité et Cryptographie
-AES (Confidentialité)
-
-Algorithme : AES
-
-Mode : ECB avec padding PKCS5
-
-Utilisation : chiffrement complet du contenu binaire du fichier
-
-Note : Le mode ECB n’est utilisé ici qu’à des fins pédagogiques.
-
-SHA-256 (Intégrité)
-
-Utilisation de l’API Java MessageDigest
-
-L’empreinte est calculée côté client puis vérifiée côté serveur
-
-Si les deux hachages sont identiques → fichier intact.
-
- 5- Structure du Répertoire
+5. Structure du Répertoire
 /src
-    ├── server/...
-    ├── client/...
-    └── utils/...
-/received_files
-/out
-.gitignore
-README.md
+ └── securefile
+      ├── SecureFileServer.java       # Classe principale du serveur
+      ├── SecureFileClient.java       # Classe principale du client
+      ├── ClientTransferHandler.java  # Gestionnaire de connexion côté serveur
+      └── CryptoUtils.java            # Fonctions utilitaires de cryptographie
 
-6-  Exécution
-1. Lancer le Serveur
+/received_files                        # Dossier créé automatiquement pour stocker les fichiers reçus
+/out                                    # Dossier de compilation/output (si nécessaire)
+/.gitignore                             # Fichier pour ignorer certains fichiers dans Git
+README.md                               # Documentation du projet
 
-Importer le projet dans IntelliJ 
+6. Exécution
+6.1 Lancer le serveur
+
+Importer le projet dans IntelliJ.
+
 Exécuter la classe SecureFileServer.
 
-2. Lancer le Client
+Le serveur écoute sur le port défini (9000 par défaut).
 
-Exécuter la classe SecureFileClient
-Saisir les informations demandées dans le terminal.
+6.2 Lancer le client
+
+Exécuter la classe SecureFileClient.
+
+Saisir les informations demandées : IP, port, login, mot de passe, chemin du fichier.
+
+Le client chiffre le fichier, l’envoie au serveur, et affiche le résultat (TRANSFER_SUCCESS ou TRANSFER_FAIL).
